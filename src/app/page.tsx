@@ -229,15 +229,15 @@ export default function Home() {
       };
       setMessages(prev => [...prev, botMessage]);
     } catch (error) {
-      console.error('Error:', error);
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: 'Maaf, ada kesalahan koneksi. Pastikan backend sedang berjalan.',
-        sender: 'bot',
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
+  console.error('Error:', error);
+  const errorMessage: Message = {
+    id: (Date.now() + 1).toString(),
+    text: 'Maaf, tidak dapat terhubung ke server. Pastikan Anda terhubung ke internet dan coba lagi.',
+    sender: 'bot',
+    timestamp: new Date(),
+  };
+  setMessages(prev => [...prev, errorMessage]);
+}finally {
       setIsLoading(false);
     }
   };
@@ -258,7 +258,6 @@ export default function Home() {
           
           {/* Floating particles */}
           {[...Array(15)].map((_, i) => {
-            // derive deterministic values from index so server and client match
             const r1 = pseudoRandom(i + 1);
             const r2 = pseudoRandom(i + 101);
             const r3 = pseudoRandom(i + 201);
@@ -475,13 +474,20 @@ export default function Home() {
             )}
             <button
               onClick={() => {
+                try { localStorage.removeItem(STORAGE_KEY); } catch {}
                 setIsOnChat(false);
+                setInputValue('');
+                setIsLoading(false);
                 setMessages([{
                   id: '1',
                   text: 'Assalamualaikum wa rahmatullahi wa barakatuh! 👋\n\nSaya adalah ChatBot khusus Wakaf. Siap membantu Anda memahami dan merencanakan wakaf Anda. Ada yang ingin diketahui tentang wakaf?',
                   sender: 'bot',
-                  timestamp: new Date(),
+                  // gunakan fixed timestamp untuk konsistensi SSR/CSR
+                  timestamp: new Date(0),
                 }]);
+                if (textareaRef.current) {
+                  textareaRef.current.style.height = 'auto';
+                }
               }}
               className="px-2 sm:px-4 py-2 text-xs sm:text-sm bg-slate-800 hover:bg-slate-700 rounded-lg transition border border-slate-700 hover:border-emerald-500/50 duration-300 hover:scale-105"
             >
